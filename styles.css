@@ -1,0 +1,53 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+
+fieldset {
+    border: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    box-sizing: border-box; /* Esto asegura que el padding no incremente el ancho del fieldset */
+}
+
+/* Estilos para el h1 dentro del fieldset */
+fieldset h1 {
+    font-size: 24px;
+    color: #ffffff;
+}
+
+/* Estilos para el contenedor de la cuadrícula */
+.image-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Tres columnas por fila */
+    gap: 20px; /* Espacio entre elementos */
+}
+
+/* Estilos para cada elemento dentro de la cuadrícula */
+.item {
+    text-align: center;
+}
+
+/* Estilos para las imágenes */
+.item img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+}
+
+/* Estilos para el texto debajo de las imágenes */
+.item p {
+    margin-top: 10px; /* Espacio entre la imagen y el texto */
+}
+
+footer{
+
+}
