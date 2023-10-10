@@ -9,7 +9,7 @@
 </head>
 <body>
     <header>
-        <fieldset>
+        <fieldset id="header-fieldset">
             <h1>Deposito y Licoreria La 103</h1>
         </fieldset>
         
@@ -73,13 +73,13 @@
             </a>
         </div>
         <!-- Fila 4 (con los dos objetos centrados) -->
-        <div class="item centered">
+        <div class="item">
             <a href="./gaseosas/gaseosas.html">
                 <img src="./gaseosas/gaseosa logo.png" alt="Gaseosas" width="300" height="200">
                 <p>Gaseosas</p>
             </a>
         </div>
-        <div class="item centered">
+        <div class="item">
             <a href="./snack/snacks.html">
                 <img src="./snack/logo snack.jpg" alt="Snacks" width="300" height="200">
                 <p>Snacks</p>
@@ -87,10 +87,28 @@
         </div>
     </div>
     
-
+    <div class="chatbot-container">
+        <div class="chatbot-header">
+            <h3>Chatbot</h3>
+            <div class="close-button" onclick="closeChatbot()">X</div>
+        </div>
+        <div class="chatbot-body">
+            <!-- Puedes agregar mensajes del chatbot aquí (simulados) -->
+            <div>¡Hola! Soy un chatbot.</div>
+            <div>¿En qué puedo ayudarte?</div>
+        </div>
+    </div>
 
     <footer>
-        <p>&copy; 2023 Deposito La 103</p>
+        <fieldset id="footer-fieldset">
+            <p>&copy; 2023 Deposito La 103</p>
+        </fieldset>
     </footer>
+
+    <script>
+        function closeChatbot() {
+            document.querySelector('.chatbot-container').style.display = 'none';
+        }
+    </script>
 </body>
 </html>

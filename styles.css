@@ -10,7 +10,7 @@ header {
     padding: 10px;
 }
 
-fieldset {
+#header-fieldset {
     border: none;
     margin: 0;
     padding: 0;
@@ -19,7 +19,7 @@ fieldset {
 }
 
 /* Estilos para el h1 dentro del fieldset */
-fieldset h1 {
+#header-fieldset h1 {
     font-size: 24px;
     color: #ffffff;
 }
@@ -33,6 +33,7 @@ fieldset h1 {
 
 /* Estilos para cada elemento dentro de la cuadrícula */
 .item {
+    margin-top: 20px;
     text-align: center;
 }
 
@@ -54,7 +55,7 @@ fieldset h1 {
     margin-left: auto;
     margin-right: auto;
     text-align: center;
-    grid-column: span 2; /* Ocupa dos columnas en lugar de tres */
+    grid-column: span 1; /* Ocupa dos columnas en lugar de tres */
 }
 
 /* Estilos para centrar los elementos 10 y 11 en la última fila */
@@ -64,6 +65,12 @@ fieldset h1 {
     width: 50%; /* Cada elemento ocupa el 50% del ancho */
 }
 
+/* Estilos para todas las imágenes dentro de .item */
+.item img {
+    width: 300px; /* El ancho deseado para todas las imágenes */
+    height: 200px; /* La altura deseada para todas las imágenes */
+}
+
 /* Añade estilos para garantizar que los elementos 10 y 11 estén en la misma fila */
 .image-container {
     display: grid;
@@ -71,6 +78,108 @@ fieldset h1 {
     gap: 20px;
 }
 
-footer{
 
+.chatbot-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 10px;
+}
+
+.chatbot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.chatbot-header h3 {
+    margin: 0;
+}
+
+.close-button {
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.chatbot-body {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+
+
+#footer-fieldset {
+    border: none;
+    margin: 0;
+    padding: 10px; /* Puedes ajustar el valor de padding según tus necesidades */
+    background-color: #333;
+    color: white;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Estilos para el h1 dentro del fieldset del footer */
+#footer-fieldset h1 {
+    font-size: 24px;
+    color: #ffffff;
+}
+
+/* Estilos para los enlaces <a> dentro de .item */
+.item a {
+    text-decoration: none; /* Quita la decoración de subrayado del enlace */
+    color: #333; /* Color de texto normal */
+    text-align: center; /* Alineación del texto */
+    font-size: 16px; /* Tamaño de fuente normal */
+    display: block; /* Hace que el enlace ocupe todo el ancho del contenedor .item */
+    margin-top: 10px; /* Espacio superior */
+    position: relative; /* Necesario para agregar fondo al texto */
+    z-index: 1; /* Asegura que el texto esté encima del fondo */
+    transition: color 0.3s; /* Transición suave para el color del texto */
+}
+
+/* Estilos para los enlaces <a> dentro de .item */
+.item a {
+    text-decoration: none; /* Quita la decoración de subrayado del enlace */
+    color: #333; /* Color de texto normal */
+    text-align: center; /* Alineación del texto */
+    font-size: 16px; /* Tamaño de fuente normal */
+    display: block; /* Hace que el enlace ocupe todo el ancho del contenedor .item */
+    margin-top: 10px; /* Espacio superior */
+    position: relative; /* Necesario para agregar fondo al texto */
+    z-index: 1; /* Asegura que el texto esté encima del fondo */
+    transition: color 0.3s; /* Transición suave para el color del texto */
+}
+
+/* Estilos para las imágenes dentro de .item */
+.item img {
+    border: 2px solid transparent; /* Borde transparente por defecto */
+    transition: border-color 0.3s; /* Transición suave para el borde */
+}
+
+/* Estilos para los enlaces <a> y las imágenes cuando se coloca el mouse encima */
+.item:hover a {
+    color: white; /* Cambia el color del texto a blanco al pasar el mouse */
+    background-color: black; /* Agrega un fondo negro al texto al pasar el mouse */
+    padding: 5px 10px; /* Añade relleno para separar el texto del fondo */
+    border-radius: 10px; /* Agrega bordes circulares a todos los lados del fondo */
+}
+
+.item:hover img {
+    border-color: black; /* Añade un borde negro al pasar el mouse */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Añade una sombra alrededor de la imagen */
 }
