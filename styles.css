@@ -3,26 +3,54 @@ body {
     padding: 0;
 }
 
+a{
+    text-decoration: none;
+    color: white;
+}
+
 header {
     background-color: #333;
     color: white;
     text-align: center;
     padding: 10px;
+    display: flex;
+    height: 70px;
+    justify-content: space-between;
+    align-items: center;
 }
 
+.logo {
+    display: flex;
+    margin-right: 10px;
+}
+
+.logo img{
+    height: 50px;
+    margin-right: 10px;
+}
+
+nav a{
+    font-weight: 600;
+    padding-right: 10px;
+}
+
+nav a:hover{
+    color: black;
+}
+/*
 #header-fieldset {
     border: none;
     margin: 0;
     padding: 0;
     width: 100%;
-    box-sizing: border-box; /* Esto asegura que el padding no incremente el ancho del fieldset */
+    box-sizing: border-box; /* Esto asegura que el padding no incremente el ancho del fieldset
 }
 
-/* Estilos para el h1 dentro del fieldset */
+/* Estilos para el h1 dentro del fieldset 
 #header-fieldset h1 {
     font-size: 24px;
     color: #ffffff;
-}
+} /*
 
 /* Estilos para el contenedor de la cuadrícula */
 .image-container {
@@ -183,3 +211,4 @@ footer {
     border-color: black; /* Añade un borde negro al pasar el mouse */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Añade una sombra alrededor de la imagen */
 }
+
