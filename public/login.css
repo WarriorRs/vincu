@@ -62,3 +62,7 @@ body {
 .form-box button[type="submit"]:hover{
     background: none;
 }
+
+#mensaje{
+    color: red;
+}

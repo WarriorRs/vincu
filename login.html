@@ -3,18 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="/login.css">
     <title>Login</title>
 </head>
 <body>
-    <form action="/autenticar" method="post" class="form-box">
-        <h1 class="form-title">Ingresar</h1>
-        <input type="text" name="username" placeholder="Nombre de usuario">
-        <input type="password" name="password" placeholder="Contraseña">
-        <button type="submit">Entrar</button>
-    </form>
+    <div>
+        <form action="/login" method="POST" class="form-box">
+            <h1 class="form-title">Ingresar</h1>
+            <input type="text" name="username" placeholder="Nombre de usuario">
+            <input type="password" name="password" placeholder="Contraseña">
+            <div id="mensaje"></div>
+            <button type="submit">Entrar</button>
+        </form>
+    </div>
+
     
     <script>
-        </script>
+        function mostrarMensaje(mensaje) {
+            const mensajeElement = document.getElementById("mensaje");
+            mensajeElement.innerHTML = `<div class="alert alert-danger">${mensaje}</div>`;
+        }
+
+        // Verifica si se recibió un mensaje de error desde el servidor
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get("error");
+
+        if (error) {
+            mostrarMensaje(error);
+        }
+     </script>
 </body>
 </html>
