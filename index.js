@@ -24,6 +24,7 @@ app.use(express.static(__dirname + '/public'));
 
 // Obtener index.html
 app.get('/', (req, res) => {
+  const username = req.query.username; // Obtén el nombre de usuario de la query
   res.sendFile(__dirname + '/index.html');
 });
 
@@ -44,12 +45,14 @@ const elementos = [
   'tequila',
   'aguas',
   'gaseosas',
-  'snack'
+  'snack',
+  'log'
 ];
 
 // Iterar a través de los elementos y crear rutas
 elementos.forEach(elemento => {
   app.get(`/${elemento}`, (req, res) => {
+    const username = req.query.username; // Obtén el nombre de usuario de la query
     res.sendFile(__dirname + `/pages/${elemento}/${elemento}.html`);
   });
 });
@@ -68,6 +71,7 @@ app.post('/login', (req, res) => {
       if (dbRes.rows.length === 1) {
         // Autenticación exitosa, establece una cookie "logged_in" con valor "true"
         res.cookie('logged_in', 'true');
+        res.cookie('username', username); // Almacena el nombre de usuario en la cookie
         res.redirect('/');
       } else {
         res.redirect('/login?error=Credenciales%20incorrectas');

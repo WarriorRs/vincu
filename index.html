@@ -9,19 +9,44 @@
 </head>
 <body>
     <header>
-            <a href="/" class="logo">
-                <img src="logo.png" alt="">
-                <h2>Depósito y Licoreria La 103</h1>
-            </a>
-            <nav>
-                <a href="/login" class="login-button" id="loginButton">Iniciar Sesion</a>
-            </nav>
+        <nav>
+            <a href="/"><img src="/logo.png" class="logo" alt=""></a>
+            
+            <ul>
+                <a href="/"><h1>Deposito La 103</h1></a>
+            </ul>
+            <img src="./log/usuario-de-perfil.png" class="user_pic" alt="" onclick="toggleMenu()">
+            
+            <a href="/login" class="login-button" id="loginButton">Iniciar Sesion</a>
+            <div class="sub-menu-wrap" id="subMenu">
+                <div class="sub-menu">
+                    <div class="user-info">
+                        <img src="./log/usuario-de-perfil.png" alt="">
+                        <h2>usernameDisplay</h2>
+                    </div>
+                    <hr>
+                    <a href="#" class="sub-menu-link">
+                        <img src="" alt=""> <p>Perfil</p>
+                        <span></span>
+                    </a>
+                    <a href="#" class="sub-menu-link">
+                        <img src="" alt=""> <p>Perfil</p>
+                        <span></span>
+                    </a>
+                    <a href="/logout" class="sub-menu-link">
+                        <img src="" alt=""> <p>Cerrar Sesión</p>
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </nav>
     </header>
+   
     <div class="image-container">
         <!-- Fila 1 -->
         <div class="item">
             <a href="/cerveza">
-                <img src="./cerveza/icono Cerveza.jpg" alt="CERVEZA" width="300" height="200">
+                <img src="./cerveza/icono Cerveza.png" alt="CERVEZA" width="300" height="200">
                 <p>Cerveza</p>
             </a>
         </div>
@@ -89,6 +114,8 @@
             </a>
         </div>
     </div>
+
+
     
     <div class="chatbot-container">
         <div class="chatbot-header">
@@ -107,7 +134,7 @@
             <p>&copy; 2023 Deposito La 103</p>
         </fieldset>
     </footer>
-
+    <script></script>
     <script>
         function closeChatbot() {
             document.querySelector('.chatbot-container').style.display = 'none';
@@ -119,6 +146,16 @@
         } else {
             document.getElementById('loginButton').textContent = 'Iniciar sesión';
         }
+
+        let subMenu = document.getElementById("subMenu");
+
+        function toggleMenu(){
+            subMenu.classList.toggle("open-menu")
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('username');
+        document.getElementById('usernameDisplay').textContent = username;
     </script>
 </body>
 </html>
