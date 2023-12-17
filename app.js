@@ -2,6 +2,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const ejs = require('ejs');
 
 const app = express();
 const port = 3000;
@@ -15,6 +16,9 @@ const pool = new Pool({
   port: 5432,
 });
 
+// Establece el motor de plantillas como EJS
+app.set('view engine', 'ejs');
+app.set('views', __dirname + '/views'); // Directorio donde se encuentran los archivos de plantilla
 app.use(cookieParser()); // Configura el middleware cookieParser
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -28,9 +32,30 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
+// Ruta para renderizar el header dinámico
+app.get('/header', (req, res) => {
+  res.render('header'); // Renderiza header.ejs
+});
+
+// Ruta para renderizar el footer dinámico
+app.get('/footer', (req, res) => {
+  res.render('footer'); // Renderiza footer.ejs
+});
+
 // Obtener login.html
 app.get('/login', (req, res) => {
   res.sendFile(__dirname + '/login.html');
+});
+
+// Obtener otros
+app.get('/config', (req, res) => {
+  res.sendFile(__dirname + '/pages/otros/config.html');
+});
+app.get('/contactanos', (req, res) => {
+  res.sendFile(__dirname + '/pages/otros/contactanos.html');
+});
+app.get('/perfil', (req, res) => {
+  res.sendFile(__dirname + '/pages/otros/perfil.html');
 });
 
 // Definir una lista de elementos
@@ -46,7 +71,7 @@ const elementos = [
   'aguas',
   'gaseosas',
   'snack',
-  'log'
+  'log',
 ];
 
 // Iterar a través de los elementos y crear rutas
