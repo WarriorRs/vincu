@@ -15,26 +15,31 @@
             <ul>
                 <a href="/"><h1>Deposito La 103</h1></a>
             </ul>
-            <img src="./log/usuario-de-perfil.png" class="user_pic" alt="" onclick="toggleMenu()">
+            <div class="imgusermenu">
+                <img src="./log/user-photo.png" class="user_pic" id="user_pic" alt="" onclick="toggleMenu()">
+                    <span onclick="toggleMenu()">usernameDisplay</span>
+                </img>
+            </div>
             
-            <a href="/login" class="login-button" id="loginButton">Iniciar Sesion</a>
-            <div class="sub-menu-wrap" id="subMenu">
+            
+            <a href="/login" class="login-button" id="loginButton" style="display: none;"><img src="./log/user-photo.png" class="login-button" alt=""><span>Iniciar Sesion</span></a>
+            <div class="sub-menu-wrap" id="subMenu" style="display: none;">
                 <div class="sub-menu">
                     <div class="user-info">
-                        <img src="./log/usuario-de-perfil.png" alt="">
+                        <img src="./log/user-photo.png" alt="">
                         <h2>usernameDisplay</h2>
                     </div>
                     <hr>
-                    <a href="#" class="sub-menu-link">
-                        <img src="" alt=""> <p>Perfil</p>
+                    <a href="/perfil" class="sub-menu-link">
+                        <img src="./log/perfilwhite.png" alt=""> <p>Perfil</p>
                         <span></span>
                     </a>
-                    <a href="#" class="sub-menu-link">
-                        <img src="" alt=""> <p>Perfil</p>
+                    <a href="/config" class="sub-menu-link">
+                        <img src="./log/configuracionwhite.png" alt=""> <p>Configuración</p>
                         <span></span>
                     </a>
                     <a href="/logout" class="sub-menu-link">
-                        <img src="" alt=""> <p>Cerrar Sesión</p>
+                        <img src="./log/salidawhite.png" alt=""> <p>Cerrar Sesión</p>
                         <span></span>
                     </a>
                 </div>
@@ -134,18 +139,29 @@
             <p>&copy; 2023 Deposito La 103</p>
         </fieldset>
     </footer>
-    <script></script>
     <script>
         function closeChatbot() {
             document.querySelector('.chatbot-container').style.display = 'none';
         }
 
         if (document.cookie.includes('logged_in=true')) {
-            document.getElementById('loginButton').textContent = 'Cerrar sesión';
-            document.getElementById('loginButton').href = '/logout'; // Agrega una ruta para cerrar sesión
+        // Si está logeado, muestra el menú desplegable y el nombre de usuario
+        document.getElementById('loginButton').style.display = 'none'; // Oculta el botón de inicio de sesión
+        document.getElementById('subMenu').style.display = 'block'; // Muestra el menú desplegable
+
+        // Configura el nombre de usuario
+        const username = document.cookie.replace(/(?:(?:^|.*;\s*)username\s*=\s*([^;]*).*$)|^.*$/, '$1');
+        document.querySelector('.user-info h2').textContent = username;
+        document.querySelector('.imgusermenu span').textContent = username;
+
         } else {
-            document.getElementById('loginButton').textContent = 'Iniciar sesión';
+            // Si no está logeado, muestra el botón de inicio de sesión y oculta el menú desplegable
+            document.getElementById('loginButton').style.display = 'block'; // Muestra el botón de inicio de sesión
+            document.getElementById('subMenu').style.display = 'none'; // Oculta el menú desplegable
+            document.querySelector('.imgusermenu').style.display= 'none';
+
         }
+
 
         let subMenu = document.getElementById("subMenu");
 
