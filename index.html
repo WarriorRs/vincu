@@ -166,6 +166,34 @@
 
         }
 
+        $(document).ready(function() {
+      // Realizar la solicitud al backend para obtener los productos de cerveza
+      $.ajax({
+        url: '/api/cerveza', // La ruta correspondiente al tipo de producto
+        method: 'GET',
+        success: function(data) {
+          // Obtener la sección de la lista de productos
+          var productListSection = $('#product-list');
+
+          // Recorrer los productos y agregarlos a la lista
+          data.productos.forEach(function(producto) {
+            var productItem = $('<div class="product-item"></div>');
+            var productName = $('<h3></h3>').text(producto.nombre);
+            var productImage = $('<img>').attr('src', producto.img).attr('alt', producto.nombre);
+            var productPrice = $('<span></span>').text('Precio: ' + producto.precio);
+
+            productItem.append(productName, productImage, productPrice);
+            productListSection.append(productItem);
+          });
+        },
+        error: function(err) {
+          console.error('Error al obtener productos', err);
+          $('#product-list').text('Error al cargar productos');
+        }
+      });
+    });
+
+
 
         let subMenu = document.getElementById("subMenu");
 
