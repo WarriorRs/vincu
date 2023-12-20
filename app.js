@@ -1,12 +1,14 @@
 const express = require('express');
 const { Pool } = require('pg');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const ejs = require('ejs');
+
 
 const app = express();
 const port = 3000;
 
+app.use(cors());
 // Configura la conexión a la base de datos
 const pool = new Pool({
   user: 'postgres',
@@ -16,9 +18,6 @@ const pool = new Pool({
   port: 5432,
 });
 
-// Establece el motor de plantillas como EJS
-app.set('view engine', 'ejs');
-app.set('views', __dirname + '/views'); // Directorio donde se encuentran los archivos de plantilla
 app.use(cookieParser()); // Configura el middleware cookieParser
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -30,16 +29,6 @@ app.use(express.static(__dirname + '/public'));
 app.get('/', (req, res) => {
   const username = req.query.username; // Obtén el nombre de usuario de la query
   res.sendFile(__dirname + '/index.html');
-});
-
-// Ruta para renderizar el header dinámico
-app.get('/header', (req, res) => {
-  res.render('header'); // Renderiza header.ejs
-});
-
-// Ruta para renderizar el footer dinámico
-app.get('/footer', (req, res) => {
-  res.render('footer'); // Renderiza footer.ejs
 });
 
 // Obtener login.html
@@ -82,6 +71,19 @@ elementos.forEach(elemento => {
   });
 });
 
+// Ruta para obtener los datos de los productos en formato JSON
+elementos.forEach(elemento => {
+  app.get(`/api/${elemento}`, (req, res) => {
+    pool.query('SELECT p.nombre, p.descripcion, p.precio, p.img, c.nombre AS categoria_nombre FROM productos p INNER JOIN categorias c ON p.categoria_id = c.id WHERE c.nombre = $1', [elemento], (err, dbRes) => {
+      if (err) {
+        console.error('Error al obtener productos', err);
+        res.status(500).json({ error: 'Error al obtener productos' });
+      } else {
+        res.status(200).json({ productos: dbRes.rows });
+      }
+    });
+  });
+});
   
 app.post('/login', (req, res) => {
   const username = req.body.username;
@@ -105,11 +107,17 @@ app.post('/login', (req, res) => {
   });
 });
 
+
+
+
 // Agrega la ruta /logout
 app.get('/logout', (req, res) => {
   res.clearCookie('logged_in'); // Elimina la cookie "logged_in"
   res.redirect('/');
 });
+
+
+
 
 app.listen(port, () => {
   console.log(`Servidor en ejecución en http://localhost:${port}`);
