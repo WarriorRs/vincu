@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configuracion</title>
+    <title>Agregar</title>
     <link rel="stylesheet" href="/styles.css">
     <link rel="icon" type="img/png" href="./logo.png">
+    <link rel="stylesheet" href="/otros/agregar.css">
 </head>
 
 <body>
@@ -52,7 +53,35 @@
     </nav>
   </header>
   <main>
-    esto es la configuracion
+    <form id="productForm">
+        <label for="searchIdOrName">Buscar por ID o Nombre:</label>
+        <input type="text" id="searchIdOrName" name="searchIdOrName">
+        <button type="button" onclick="buscarProducto()">Buscar</button><br><br>
+
+        <label for="categoria_id">ID de categoría:</label>
+        <input type="number" id="categoria_id" name="categoria_id" min="1" inputmode="numeric" pattern="^[0-9]*$">
+      
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre"><br><br>
+      
+        <label for="descripcion">Descripción:</label>
+        <input type="text" id="descripcion" name="descripcion"><br><br>
+      
+        <label for="precio">Precio (USD):</label>
+        <input type="number" id="precio" name="precio" min="0.00" inputmode="numeric" pattern="^\d+(\.\d{1,2})?$" placeholder="Formato: $0.00">
+      
+        <!-- Cambio de input a botón para subir imagen -->
+        <label for="img">Subir Imagen:</label>
+        <input type="file" id="img" name="img" accept="image/*"><br><br>
+      
+        <!-- Campo oculto para almacenar el ID del producto encontrado -->
+        <input type="hidden" id="productID" name="productID">
+        <div class="botones-api">
+            <button type="button" id="crearbutton" onclick="crearProducto()">Crear</button>
+            <button type="button" id="modificarbutton" onclick="modificarProducto()">Modificar</button>
+            <button type="button" id="eliminarbutton" onclick="eliminarProducto()">Eliminar</button>
+        </div>
+      </form>
   </main>
   
   <script>

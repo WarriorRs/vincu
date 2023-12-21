@@ -1,0 +1,80 @@
+/* Estilos para el formulario con id="productForm" */
+#productForm {
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+#productForm label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#productForm input[type="text"],
+#productForm input[type="number"] {
+    width: calc(100% - 12px);
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+
+#productForm button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 3px;
+    background-color: #2980b9;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#productForm button:hover {
+    background-color: #03446f;
+}
+
+.botones-api #crearbutton{
+    background-color: rgb(112, 186, 0);
+    transition: background-color 0.3s;
+}
+
+.botones-api #modificarbutton{
+    background-color: orange;
+    transition: background-color 0.3s;
+}
+
+.botones-api #eliminarbutton{
+    background-color: red;
+    transition: background-color 0.3s;
+}
+
+.botones-api #crearbutton:hover{
+    background-color: rgb(70, 117, 0);
+}
+
+.botones-api #modificarbutton:hover{
+    background-color: rgb(152, 99, 0);
+}
+
+.botones-api #eliminarbutton:hover{
+    background-color: rgb(120, 0, 0);
+}
+
+#img {
+    width: auto;
+}
+
+/* Estilos para eliminar las flechas en input number */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}

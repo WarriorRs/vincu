@@ -36,16 +36,7 @@ app.get('/login', (req, res) => {
   res.sendFile(__dirname + '/login.html');
 });
 
-// Obtener otros
-app.get('/config', (req, res) => {
-  res.sendFile(__dirname + '/pages/otros/config.html');
-});
-app.get('/contactanos', (req, res) => {
-  res.sendFile(__dirname + '/pages/otros/contactanos.html');
-});
-app.get('/perfil', (req, res) => {
-  res.sendFile(__dirname + '/pages/otros/perfil.html');
-});
+
 
 // Definir una lista de elementos
 const elementos = [
@@ -68,6 +59,22 @@ elementos.forEach(elemento => {
   app.get(`/${elemento}`, (req, res) => {
     const username = req.query.username; // Obtén el nombre de usuario de la query
     res.sendFile(__dirname + `/pages/${elemento}/${elemento}.html`);
+  });
+});
+
+// Definir una lista de elementos
+const otros = [
+  'config',
+  'contactanos',
+  'perfil',
+  'agregar'
+];
+
+// Iterar a través de los elementos y crear rutas
+otros.forEach(otros => {
+  app.get(`/${otros}`, (req, res) => {
+    const username = req.query.username; // Obtén el nombre de usuario de la query
+    res.sendFile(__dirname + `/pages/otros/${otros}.html`);
   });
 });
 
