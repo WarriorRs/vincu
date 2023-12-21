@@ -6,6 +6,7 @@
     <title>Aguardiente</title>
     <link rel="stylesheet" href="/styles.css">
     <link rel="icon" type="img/png" href="./logo.png">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <header>
@@ -47,16 +48,8 @@
         </nav>
     </header>
     <main>
-        <section class="products-list">
-            <div class="product-item">
-            <h3>Cristal aguardiente clásico</h3>
-            <img src="./cristal-aguardiente-clasico-750ml.jpg" alt="">
-            </div>          
-        </section>
-
+        <section class="products-list" id="product-list"></section>
     </main>
-    
-
     <script>
         function closeChatbot() {
         document.querySelector('.chatbot-container').style.display = 'none';
@@ -91,7 +84,7 @@
     $(document).ready(function() {
       // Realizar la solicitud al backend para obtener los productos de cerveza
       $.ajax({
-        url: '/api/cerveza', // La ruta correspondiente al tipo de producto
+        url: '/api/aguardiente', // La ruta correspondiente al tipo de producto
         method: 'GET',
         success: function(data) {
           // Obtener la sección de la lista de productos
@@ -102,7 +95,7 @@
             var productItem = $('<div class="product-item"></div>');
             var productName = $('<h3></h3>').text(producto.nombre);
             var productImage = $('<img>').attr('src', producto.img).attr('alt', producto.nombre);
-            var productPrice = $('<span></span>').text('Precio: ' + producto.precio);
+            var productPrice = $('<span></span>').text('Precio: $' + producto.precio);
 
             productItem.append(productName, productImage, productPrice);
             productListSection.append(productItem);

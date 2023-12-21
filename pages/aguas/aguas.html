@@ -6,6 +6,7 @@
     <title>Aguas</title>
     <link rel="stylesheet" href="/styles.css">
     <link rel="icon" type="img/png" href="./logo.png">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
@@ -48,16 +49,7 @@
     </nav>
   </header>
   <main>
-    <section class="products-list">
-      <div class="product-item">
-        <h3>Agua Dasani</h3>
-        <img src="./aguadasani.png" alt="">
-      </div> 
-      <div class="product-item">
-        <h3>Güitig 300ml</h3>
-        <img src="./GUITIG-300ML.png" alt="">
-      </div>          
-    </section>
+    <section class="products-list" id="product-list"></section>
   </main>
 
   <footer>
@@ -86,7 +78,6 @@
         document.getElementById('loginButton').style.display = 'block'; // Muestra el botón de inicio de sesión
         document.getElementById('subMenu').style.display = 'none'; // Oculta el menú desplegable
         document.querySelector('.imgusermenu').style.display= 'none';
-
     }
 
 
@@ -95,7 +86,39 @@
     function toggleMenu(){
         subMenu.classList.toggle("open-menu")
     }
+    
 
+    $(document).ready(function() {
+      // Realizar la solicitud al backend para obtener los productos de cerveza
+      $.ajax({
+        url: '/api/aguas', // La ruta correspondiente al tipo de producto
+        method: 'GET',
+        success: function(data) {
+          // Obtener la sección de la lista de productos
+          var productListSection = $('#product-list');
+
+          // Recorrer los productos y agregarlos a la lista
+          data.productos.forEach(function(producto) {
+            var productItem = $('<div class="product-item"></div>');
+            var productName = $('<h3></h3>').text(producto.nombre);
+            var productImage = $('<img>').attr('src', producto.img).attr('alt', producto.nombre);
+            var productPrice = $('<span></span>').text('Precio: $' + producto.precio);
+
+            productItem.append(productName, productImage, productPrice);
+            productListSection.append(productItem);
+          });
+        },
+        error: function(err) {
+          console.error('Error al obtener productos', err);
+          $('#product-list').text('Error al cargar productos');
+        }
+      });
+    });
+
+
+
+
+      
     const urlParams = new URLSearchParams(window.location.search);
     const username = urlParams.get('username');
     document.getElementById('usernameDisplay').textContent = username;

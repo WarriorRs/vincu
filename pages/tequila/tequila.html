@@ -96,7 +96,7 @@
             var productItem = $('<div class="product-item"></div>');
             var productName = $('<h3></h3>').text(producto.nombre);
             var productImage = $('<img>').attr('src', producto.img).attr('alt', producto.nombre);
-            var productPrice = $('<span></span>').text('Precio: ' + producto.precio);
+            var productPrice = $('<span></span>').text('Precio: $' + producto.precio);
 
             productItem.append(productName, productImage, productPrice);
             productListSection.append(productItem);

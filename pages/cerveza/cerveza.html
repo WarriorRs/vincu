@@ -46,10 +46,10 @@
             </div>
         </div>
     </nav>
-</header>
-<main>
-  <section class="products-list" id="product-list"></section>
-</main>
+  </header>
+  <main>
+    <section class="products-list" id="product-list"></section>
+  </main>
   
   <script>
     function closeChatbot() {
@@ -71,9 +71,7 @@
         document.getElementById('loginButton').style.display = 'block'; // Muestra el botón de inicio de sesión
         document.getElementById('subMenu').style.display = 'none'; // Oculta el menú desplegable
         document.querySelector('.imgusermenu').style.display= 'none';
-
     }
-
 
     let subMenu = document.getElementById("subMenu");
 
@@ -96,7 +94,7 @@
             var productItem = $('<div class="product-item"></div>');
             var productName = $('<h3></h3>').text(producto.nombre);
             var productImage = $('<img>').attr('src', producto.img).attr('alt', producto.nombre);
-            var productPrice = $('<span></span>').text('Precio: ' + producto.precio);
+            var productPrice = $('<span></span>').text('Precio: $' + producto.precio);
 
             productItem.append(productName, productImage, productPrice);
             productListSection.append(productItem);
@@ -109,10 +107,6 @@
       });
     });
 
-
-
-
-      
     const urlParams = new URLSearchParams(window.location.search);
     const username = urlParams.get('username');
     document.getElementById('usernameDisplay').textContent = username;

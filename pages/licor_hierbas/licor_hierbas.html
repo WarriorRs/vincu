@@ -45,49 +45,75 @@
                 </div>
             </div>
         </nav>
-      </header>
+    </header>
       <main>
-          <section class="products-list">
-              <div class="product-item">
-              <h3>Yzaguirre Rojo</h3>
-              <img src="./licores_0000_Yzaguirre-Rojo.png" alt="">
-              </div>          
-          </section>
+        <section class="products-list" id="product-list"></section>
       </main>
 
       <script>
         function closeChatbot() {
-            document.querySelector('.chatbot-container').style.display = 'none';
+        document.querySelector('.chatbot-container').style.display = 'none';
+    }
+
+    if (document.cookie.includes('logged_in=true')) {
+    // Si está logeado, muestra el menú desplegable y el nombre de usuario
+    document.getElementById('loginButton').style.display = 'none'; // Oculta el botón de inicio de sesión
+    document.getElementById('subMenu').style.display = 'block'; // Muestra el menú desplegable
+
+    // Configura el nombre de usuario
+    const username = document.cookie.replace(/(?:(?:^|.*;\s*)username\s*=\s*([^;]*).*$)|^.*$/, '$1');
+    document.querySelector('.user-info h2').textContent = username;
+    document.querySelector('.imgusermenu span').textContent = username;
+
+    } else {
+        // Si no está logeado, muestra el botón de inicio de sesión y oculta el menú desplegable
+        document.getElementById('loginButton').style.display = 'block'; // Muestra el botón de inicio de sesión
+        document.getElementById('subMenu').style.display = 'none'; // Oculta el menú desplegable
+        document.querySelector('.imgusermenu').style.display= 'none';
+    }
+
+
+    let subMenu = document.getElementById("subMenu");
+
+    function toggleMenu(){
+        subMenu.classList.toggle("open-menu")
+    }
+    
+
+    $(document).ready(function() {
+      // Realizar la solicitud al backend para obtener los productos de cerveza
+      $.ajax({
+        url: '/api/licor_hierbas', // La ruta correspondiente al tipo de producto
+        method: 'GET',
+        success: function(data) {
+          // Obtener la sección de la lista de productos
+          var productListSection = $('#product-list');
+
+          // Recorrer los productos y agregarlos a la lista
+          data.productos.forEach(function(producto) {
+            var productItem = $('<div class="product-item"></div>');
+            var productName = $('<h3></h3>').text(producto.nombre);
+            var productImage = $('<img>').attr('src', producto.img).attr('alt', producto.nombre);
+            var productPrice = $('<span></span>').text('Precio: $' + producto.precio);
+
+            productItem.append(productName, productImage, productPrice);
+            productListSection.append(productItem);
+          });
+        },
+        error: function(err) {
+          console.error('Error al obtener productos', err);
+          $('#product-list').text('Error al cargar productos');
         }
-    
-        if (document.cookie.includes('logged_in=true')) {
-        // Si está logeado, muestra el menú desplegable y el nombre de usuario
-        document.getElementById('loginButton').style.display = 'none'; // Oculta el botón de inicio de sesión
-        document.getElementById('subMenu').style.display = 'block'; // Muestra el menú desplegable
-    
-        // Configura el nombre de usuario
-        const username = document.cookie.replace(/(?:(?:^|.*;\s*)username\s*=\s*([^;]*).*$)|^.*$/, '$1');
-        document.querySelector('.user-info h2').textContent = username;
-        document.querySelector('.imgusermenu span').textContent = username;
-    
-        } else {
-            // Si no está logeado, muestra el botón de inicio de sesión y oculta el menú desplegable
-            document.getElementById('loginButton').style.display = 'block'; // Muestra el botón de inicio de sesión
-            document.getElementById('subMenu').style.display = 'none'; // Oculta el menú desplegable
-            document.querySelector('.imgusermenu').style.display= 'none';
-    
-        }
-    
-    
-        let subMenu = document.getElementById("subMenu");
-    
-        function toggleMenu(){
-            subMenu.classList.toggle("open-menu")
-        }
-    
-        const urlParams = new URLSearchParams(window.location.search);
-        const username = urlParams.get('username');
-        document.getElementById('usernameDisplay').textContent = username;
+      });
+    });
+
+
+
+
+      
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = urlParams.get('username');
+    document.getElementById('usernameDisplay').textContent = username;
       </script> 
 </body>
 </html>

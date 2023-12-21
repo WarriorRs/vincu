@@ -6,31 +6,110 @@
     <title>Ron</title>
     <link rel="stylesheet" href="/styles.css">
     <link rel="icon" type="img/png" href="./logo.png">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
-<header>
-    <a href="/" class="logo">
-        <img src="logo.png" alt="">
-        <h2>Depósito y Licoreria La 103</h1>
-    </a>
-    <nav>
-        <a href="/login" class="login-button" id="loginButton">Iniciar Sesion</a>
-    </nav>
-    </header>
-    <body>
-    <section class="products-list">
-        <div class="product-item">
-        <h3>Ron Añejo Carúpano 750ml</h3>
-        <img src="./ron-anejo-carupano-reserva-6-anos-750ml.jpg" alt="">
-        </div>          
-    </section>
+<body>
+    <header>
+        <nav>
+            <a href="/"><img src="/logo.png" class="logo" alt=""></a>
+            
+            <ul>
+                <a href="/"><h1>Deposito La 103</h1></a>
+            </ul>
+            <div class="imgusermenu">
+                <img src="../log/user-photo.png" class="user_pic" id="user_pic" alt="" onclick="toggleMenu()">
+                    <span onclick="toggleMenu()">usernameDisplay</span>
+                </img>
+            </div>
+            
+            
+            <a href="/login" class="login-button" id="loginButton" style="display: none;"><img src="../log/user-photo.png" class="login-button" alt=""><span>Iniciar Sesion</span></a>
+            <div class="sub-menu-wrap" id="subMenu" style="display: none;">
+                <div class="sub-menu">
+                    <div class="user-info">
+                        <img src="../log/user-photo.png" alt="">
+                        <h2>usernameDisplay</h2>
+                    </div>
+                    <hr>
+                    <a href="/perfil" class="sub-menu-link">
+                        <img src="../log/perfilwhite.png" alt=""> <p>Perfil</p>
+                        <span></span>
+                    </a>
+                    <a href="/config" class="sub-menu-link">
+                        <img src="../log/configuracionwhite.png" alt=""> <p>Configuración</p>
+                        <span></span>
+                    </a>
+                    <a href="/logout" class="sub-menu-link">
+                        <img src="../log/salidawhite.png" alt=""> <p>Cerrar Sesión</p>
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+      </header>
+      <main>
+        <section class="products-list" id="product-list"></section>
+      </main>
 
     <script>
-        if (document.cookie.includes('logged_in=true')) {
-            document.getElementById('loginButton').textContent = 'Cerrar sesión';
-            document.getElementById('loginButton').href = '/logout'; // Agrega una ruta para cerrar sesión
-        } else {
-            document.getElementById('loginButton').textContent = 'Iniciar sesión';
+        function closeChatbot() {
+        document.querySelector('.chatbot-container').style.display = 'none';
+    }
+
+    if (document.cookie.includes('logged_in=true')) {
+    // Si está logeado, muestra el menú desplegable y el nombre de usuario
+    document.getElementById('loginButton').style.display = 'none'; // Oculta el botón de inicio de sesión
+    document.getElementById('subMenu').style.display = 'block'; // Muestra el menú desplegable
+
+    // Configura el nombre de usuario
+    const username = document.cookie.replace(/(?:(?:^|.*;\s*)username\s*=\s*([^;]*).*$)|^.*$/, '$1');
+    document.querySelector('.user-info h2').textContent = username;
+    document.querySelector('.imgusermenu span').textContent = username;
+
+    } else {
+        // Si no está logeado, muestra el botón de inicio de sesión y oculta el menú desplegable
+        document.getElementById('loginButton').style.display = 'block'; // Muestra el botón de inicio de sesión
+        document.getElementById('subMenu').style.display = 'none'; // Oculta el menú desplegable
+        document.querySelector('.imgusermenu').style.display= 'none';
+    }
+
+    let subMenu = document.getElementById("subMenu");
+
+    function toggleMenu(){
+        subMenu.classList.toggle("open-menu")
+    }
+    
+
+    $(document).ready(function() {
+      // Realizar la solicitud al backend para obtener los productos de cerveza
+      $.ajax({
+        url: '/api/ron', // La ruta correspondiente al tipo de producto
+        method: 'GET',
+        success: function(data) {
+          // Obtener la sección de la lista de productos
+          var productListSection = $('#product-list');
+
+          // Recorrer los productos y agregarlos a la lista
+          data.productos.forEach(function(producto) {
+            var productItem = $('<div class="product-item"></div>');
+            var productName = $('<h3></h3>').text(producto.nombre);
+            var productImage = $('<img>').attr('src', producto.img).attr('alt', producto.nombre);
+            var productPrice = $('<span></span>').text('Precio: $' + producto.precio);
+
+            productItem.append(productName, productImage, productPrice);
+            productListSection.append(productItem);
+          });
+        },
+        error: function(err) {
+          console.error('Error al obtener productos', err);
+          $('#product-list').text('Error al cargar productos');
         }
+      });
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = urlParams.get('username');
+    document.getElementById('usernameDisplay').textContent = username;
     </script>
 </body>
 </html>
