@@ -54,34 +54,49 @@
   </header>
   <main>
     <form id="productForm">
-        <label for="searchIdOrName">Buscar por ID o Nombre:</label>
-        <input type="text" id="searchIdOrName" name="searchIdOrName">
-        <button type="button" onclick="buscarProducto()">Buscar</button><br><br>
-
-        <label for="categoria_id">ID de categoría:</label>
-        <input type="number" id="categoria_id" name="categoria_id" min="1" inputmode="numeric" pattern="^[0-9]*$">
-      
-        <label for="nombre">Nombre:</label>
-        <input type="text" id="nombre" name="nombre"><br><br>
-      
-        <label for="descripcion">Descripción:</label>
-        <input type="text" id="descripcion" name="descripcion"><br><br>
-      
-        <label for="precio">Precio (USD):</label>
-        <input type="number" id="precio" name="precio" min="0.00" inputmode="numeric" pattern="^\d+(\.\d{1,2})?$" placeholder="Formato: $0.00">
-      
-        <!-- Cambio de input a botón para subir imagen -->
-        <label for="img">Subir Imagen:</label>
-        <input type="file" id="img" name="img" accept="image/*"><br><br>
-      
-        <!-- Campo oculto para almacenar el ID del producto encontrado -->
-        <input type="hidden" id="productID" name="productID">
+        <div class="contenedor">
+            <div class="api-agregar">
+                <div class="api-agregar">
+                    <h1 style="margin-top: 0;">Producto</h1>
+                    <label for="searchIdOrName">Buscar por ID o Nombre:</label>
+                    <input type="text" id="searchIdOrName" name="searchIdOrName">
+                    <button type="button" onclick="buscarProducto()">Buscar</button><br><br>
+            
+                    <label for="categoria_id">ID de categoría:</label>
+                    <input type="number" id="categoria_id" name="categoria_id" min="1" inputmode="numeric" pattern="^[0-9]*$">
+                  
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre">
+                  
+                    <label for="descripcion">Descripción:</label>
+                    <input type="text" id="descripcion" name="descripcion">
+                  
+                    <label for="precio">Precio (USD):</label>
+                    <input type="number" id="precio" name="precio" min="0.00" inputmode="numeric" pattern="^\d+(\.\d{1,2})?$" placeholder="Formato: $0.00">
+                  
+                    <!-- Cambio de input a botón para subir imagen -->
+                    <label for="img">Subir Imagen:</label>
+                    <input type="file" id="img" name="img" accept="image/*"><br><br>
+                  
+                    <!-- Campo oculto para almacenar el ID del producto encontrado -->
+                    <input type="hidden" id="productID" name="productID">
+                </div>
+            </div>
+            <div class="previsualizar">
+                <h1 id="titulo-prev">Previsualización</h1>
+                <div class="prev-img-product">
+                    <label for="img-prev"></label>
+                    <img src="" alt="" name="img-prev" id="img-prev">
+                    <p></p>
+                </div>
+            </div>
+        </div>
         <div class="botones-api">
             <button type="button" id="crearbutton" onclick="crearProducto()">Crear</button>
             <button type="button" id="modificarbutton" onclick="modificarProducto()">Modificar</button>
             <button type="button" id="eliminarbutton" onclick="eliminarProducto()">Eliminar</button>
         </div>
-      </form>
+     </form>
   </main>
   
   <script>
@@ -113,6 +128,46 @@
     function toggleMenu(){
         subMenu.classList.toggle("open-menu")
     }
+
+    // Seleccionar el input de tipo file
+    const inputImg = document.getElementById('img');
+
+    // Agregar un listener para el cambio en el input file
+    inputImg.addEventListener('change', function(event) {
+        const file = event.target.files[0]; // Obtener el archivo seleccionado
+
+        // Crear un objeto URL para la imagen seleccionada
+        const imgUrl = URL.createObjectURL(file);
+
+        // Mostrar la imagen en el área de previsualización
+        const imgPreview = document.getElementById('img-prev');
+        imgPreview.src = imgUrl;
+        imgPreview.style.display = 'block'; // Mostrar la imagen si estaba oculta
+    });
+
+    const nombreInput = document.getElementById('nombre');
+    const nombrePreviewLabel = document.querySelector('.prev-img-product label');
+
+    nombreInput.addEventListener('input', function(event) {
+        const nombreValue = event.target.value;
+        nombrePreviewLabel.textContent = nombreValue;
+    });
+
+    const precioInput = document.getElementById('precio');
+    const precioPreview = document.querySelector('.prev-img-product p');
+
+    precioInput.addEventListener('input', function(event) {
+        const precioValue = event.target.value.trim(); // Obtener el valor y eliminar espacios en blanco al inicio y final
+
+        // Verificar si el campo de precio está vacío o no
+        if (precioValue === '') {
+            precioPreview.textContent = ''; // Dejar el texto del párrafo vacío
+        } else {
+            // Si hay un valor, formatearlo y mostrarlo en el párrafo
+            const formattedPrice = parseFloat(precioValue).toFixed(2);
+            precioPreview.textContent = `Precio: $${formattedPrice}`;
+        }
+    });
 
     const urlParams = new URLSearchParams(window.location.search);
     const username = urlParams.get('username');
