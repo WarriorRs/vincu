@@ -54,6 +54,24 @@
     font-weight: bold;
 }
 
+#productForm select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: white; /* Fondo blanco similar a otros campos */
+    font-size: 14px; /* Tamaño de fuente igual a otros campos */
+    color: #555; /* Color de texto similar a otros campos */
+}
+
+/* Estilo para cuando el select está enfocado */
+#productForm select:focus {
+    outline: none; /* Quita el contorno predeterminado al enfocar */
+    border-color: #2980b9; /* Cambia el color del borde al enfocar */
+    box-shadow: 0 0 5px rgba(41, 128, 185, 0.5); /* Sombra al enfocar */
+}
+
 #productForm input[type="text"],
 #productForm input[type="number"] {
     width: calc(100% - 12px);
@@ -87,6 +105,8 @@
     background-color: orange;
     transition: background-color 0.3s;
 }
+
+
 
 .botones-api #eliminarbutton{
     background-color: red;

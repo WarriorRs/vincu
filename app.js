@@ -70,6 +70,42 @@ const otros = [
   'agregar'
 ];
 
+// Ruta para obtener las categorías desde la base de datos en formato JSON
+app.get('/api/categorias', (req, res) => {
+  pool.query('SELECT nombre FROM categorias WHERE nombre != $1', ['log'], (err, dbRes) => {
+    if (err) {
+      console.error('Error al obtener categorías', err);
+      res.status(500).json({ error: 'Error al obtener categorías' });
+    } else {
+      const categorias = dbRes.rows.map(row => row.nombre.charAt(0).toUpperCase() + row.nombre.slice(1)); // Convertir la primera letra a mayúscula
+      res.status(200).json({ categorias });
+    }
+  });
+});
+
+// Agrega una nueva ruta para buscar productos por ID o nombre
+app.get('/api/productos/buscar', (req, res) => {
+  const searchQuery = req.query.q; // Obtener el parámetro de búsqueda desde la URL
+
+  // Realizar una consulta a la base de datos para buscar por ID o nombre
+  pool.query('SELECT * FROM productos WHERE id = $1 OR nombre ILIKE $2', [searchQuery, `%${searchQuery}%`], (err, dbRes) => {
+    if (err) {
+      console.error('Error al buscar producto', err);
+      res.status(500).json({ error: 'Error al buscar producto' });
+    } else {
+      if (dbRes.rows.length > 0) {
+        const productoEncontrado = dbRes.rows[0]; // Tomar el primer resultado (pueden ser múltiples)
+
+        // Enviar los datos del producto encontrado como respuesta
+        res.status(200).json({ producto: productoEncontrado });
+      } else {
+        res.status(404).json({ mensaje: 'Producto no encontrado' });
+      }
+    }
+  });
+});
+
+
 // Iterar a través de los elementos y crear rutas
 otros.forEach(otros => {
   app.get(`/${otros}`, (req, res) => {

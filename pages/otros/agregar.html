@@ -59,17 +59,20 @@
                 <div class="api-agregar">
                     <h1 style="margin-top: 0;">Producto</h1>
                     <label for="searchIdOrName">Buscar por ID o Nombre:</label>
-                    <input type="text" id="searchIdOrName" name="searchIdOrName">
+                    <input type="text" id="searchIdOrName" name="searchIdOrName" placeholder="Busca un producto">
                     <button type="button" onclick="buscarProducto()">Buscar</button><br><br>
             
-                    <label for="categoria_id">ID de categoría:</label>
-                    <input type="number" id="categoria_id" name="categoria_id" min="1" inputmode="numeric" pattern="^[0-9]*$">
-                  
+                    <label for="categoria">Categoría:</label>
+                    <select id="categoria" name="categoria">
+                        <option value="" disabled selected>Selecciona una categoría</option>
+                        <!-- Agrega más opciones de categorías según sea necesario -->
+                    </select>
+
                     <label for="nombre">Nombre:</label>
-                    <input type="text" id="nombre" name="nombre">
+                    <input type="text" id="nombre" name="nombre" placeholder="Nombre del prodcuto">
                   
                     <label for="descripcion">Descripción:</label>
-                    <input type="text" id="descripcion" name="descripcion">
+                    <input type="text" id="descripcion" name="descripcion" placeholder="Descripción del prodcuto">
                   
                     <label for="precio">Precio (USD):</label>
                     <input type="number" id="precio" name="precio" min="0.00" inputmode="numeric" pattern="^\d+(\.\d{1,2})?$" placeholder="Formato: $0.00">
@@ -122,6 +125,21 @@
 
     }
 
+    window.addEventListener('DOMContentLoaded', () => {
+    fetch('/api/categorias')
+      .then(response => response.json())
+      .then(data => {
+        const select = document.getElementById('categoria');
+
+        data.categorias.forEach(categoria => {
+          const option = document.createElement('option');
+          option.value = categoria;
+          option.textContent = categoria;
+          select.appendChild(option);
+        });
+      })
+      .catch(error => console.error('Error al cargar categorías:', error));
+  });
 
     let subMenu = document.getElementById("subMenu");
 
@@ -168,6 +186,42 @@
             precioPreview.textContent = `Precio: $${formattedPrice}`;
         }
     });
+
+    function buscarProducto() {
+    const searchValue = document.getElementById('searchIdOrName').value;
+
+    // Realizar una solicitud al servidor para buscar el producto por ID o nombre
+    fetch(`/api/productos/buscar?q=${searchValue}`)
+        .then(response => response.json())
+        .then(data => {
+        if (data.producto) {
+            // Rellenar los campos con la información del producto encontrado
+            const producto = data.producto;
+            document.getElementById('nombre').value = producto.nombre;
+            document.getElementById('descripcion').value = producto.descripcion;
+            document.getElementById('precio').value = producto.precio;
+
+            // Obtener el nombre de la categoría del producto por su ID de categoría
+            fetch(`/api/categorias/${producto.categoria_id}`) // Asume que hay una ruta para obtener el nombre de la categoría por su ID
+            .then(response => response.json())
+            .then(data => {
+                const categoriaNombre = data.nombre; // Nombre de la categoría obtenida del servidor
+                // Actualizar el campo de selección de categoría con el nombre obtenido
+                const selectCategoria = document.getElementById('categoria');
+                const option = Array.from(selectCategoria.options).find(option => option.text === categoriaNombre);
+                if (option) {
+                option.selected = true;
+                }
+            })
+            .catch(error => console.error('Error al obtener la categoría:', error));
+            
+            // Rellena otros campos según la estructura del objeto producto
+        } else {
+            alert('Producto no encontrado');
+        }
+        })
+        .catch(error => console.error('Error al buscar producto:', error));
+    }
 
     const urlParams = new URLSearchParams(window.location.search);
     const username = urlParams.get('username');
