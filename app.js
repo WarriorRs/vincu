@@ -72,7 +72,7 @@ const otros = [
 
 // Ruta para obtener las categorías desde la base de datos en formato JSON
 app.get('/api/categorias', (req, res) => {
-  pool.query('SELECT nombre FROM categorias WHERE nombre != $1', ['log'], (err, dbRes) => {
+  pool.query('SELECT * FROM categorias WHERE nombre != $1', ['log'], (err, dbRes) => {
     if (err) {
       console.error('Error al obtener categorías', err);
       res.status(500).json({ error: 'Error al obtener categorías' });
@@ -87,8 +87,19 @@ app.get('/api/categorias', (req, res) => {
 app.get('/api/productos/buscar', (req, res) => {
   const searchQuery = req.query.q; // Obtener el parámetro de búsqueda desde la URL
 
-  // Realizar una consulta a la base de datos para buscar por ID o nombre
-  pool.query('SELECT * FROM productos WHERE id = $1 OR nombre ILIKE $2', [searchQuery, `%${searchQuery}%`], (err, dbRes) => {
+  let query = 'SELECT p.*, c.nombre AS categoria_nombre FROM productos p LEFT JOIN categorias c ON p.categoria_id = c.id WHERE ';
+  let params = [];
+
+  // Verificar si es un número (probablemente un ID)
+  if (!isNaN(searchQuery)) {
+    query += 'p.id = $1';
+    params.push(searchQuery);
+  } else {
+    query += 'LOWER(p.nombre) LIKE $1';
+    params.push(`%${searchQuery.toLowerCase()}%`);
+  }
+
+  pool.query(query, params, (err, dbRes) => {
     if (err) {
       console.error('Error al buscar producto', err);
       res.status(500).json({ error: 'Error al buscar producto' });
@@ -96,12 +107,66 @@ app.get('/api/productos/buscar', (req, res) => {
       if (dbRes.rows.length > 0) {
         const productoEncontrado = dbRes.rows[0]; // Tomar el primer resultado (pueden ser múltiples)
 
-        // Enviar los datos del producto encontrado como respuesta
-        res.status(200).json({ producto: productoEncontrado });
+        // Obtener el nombre de la categoría del producto
+        const categoriaNombre = productoEncontrado.categoria_nombre;
+
+        // Enviar los datos del producto encontrado como respuesta junto con el nombre de la categoría
+        res.status(200).json({ producto: productoEncontrado, categoriaNombre });
       } else {
         res.status(404).json({ mensaje: 'Producto no encontrado' });
       }
     }
+  });
+});
+
+app.get('/api/productos/autocompletar', (req, res) => {
+  const searchTerm = req.query.q.toLowerCase();
+
+  pool.query(
+    'SELECT nombre FROM productos WHERE LOWER(nombre) LIKE $1',
+    [`%${searchTerm}%`],
+    (err, dbRes) => {
+      if (err) {
+        console.error('Error al buscar productos para autocompletar', err);
+        res.status(500).json({ error: 'Error al buscar productos para autocompletar' });
+      } else {
+        const productos = dbRes.rows.map(row => row.nombre);
+        res.status(200).json({ productos });
+      }
+    }
+  );
+});
+
+// Agrega una ruta para crear un nuevo producto
+app.post('/api/productos/crear', (req, res) => {
+  const { nombre, descripcion, categoriaNombre, precio, img } = req.body;
+
+  // Primero, obtén el ID de la categoría basado en su nombre
+  pool.query('SELECT id FROM categorias WHERE LOWER(nombre) = $1', [categoriaNombre], (err, dbRes) => {
+      if (err) {
+          console.error('Error al buscar la categoría:', err);
+          res.status(500).json({ error: 'Error al buscar la categoría' });
+      } else {
+          if (dbRes.rows.length > 0) {
+              const categoriaId = dbRes.rows[0].id;
+
+              // Insertar el nuevo producto en la base de datos
+              pool.query(
+                  'INSERT INTO productos (nombre, descripcion, categoria_id, precio, img) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+                  [nombre, descripcion, categoriaId, precio, img],
+                  (insertErr, insertRes) => {
+                      if (insertErr) {
+                          console.error('Error al crear el producto:', insertErr);
+                          res.status(500).json({ error: 'Error al crear el producto' });
+                      } else {
+                          res.status(200).json({ message: 'Producto creado exitosamente', producto: insertRes.rows[0] });
+                      }
+                  }
+              );
+          } else {
+              res.status(404).json({ error: 'Categoría no encontrada' });
+          }
+      }
   });
 });
 
