@@ -68,20 +68,21 @@
                         <option value="" disabled selected>Selecciona una categoría</option>
                         <!-- Agrega más opciones de categorías según sea necesario -->
                     </select>
-
+                    
                     <label for="nombre">Nombre:</label>
                     <input type="text" id="nombre" name="nombre" placeholder="Nombre del producto">
-
+                    
                     <label for="descripcion">Descripción:</label>
                     <input type="text" id="descripcion" name="descripcion" placeholder="Descripción del producto">
-
+                    
                     <label for="precio">Precio (USD):</label>
                     <input type="number" id="precio" name="precio" min="0.00" inputmode="numeric" pattern="^\d+(\.\d{1,2})?$" placeholder="Formato: $0.00">
-
+                    
                     <!-- Input para subir imagen con URL -->
                     <label for="img">Enlace de la Imagen:</label>
                     <input type="text" id="img" name="img" placeholder="URL de la imagen">
-
+                    
+                    
                     <!-- Campo oculto para almacenar el ID del producto encontrado -->
                     <input type="hidden" id="productID" name="productID">
                 </div>
@@ -101,7 +102,7 @@
             <button type="button" id="eliminarbutton" onclick="eliminarProducto()">Eliminar</button>
             <button type="button" id="cancelarbutton" onclick="cancelarButton()">Cancelar</button>
         </div>
-        <div id="mensaje" style="display: none;"></div>
+        <div id="mensaje" class="error-message" style="display: none;"></div>
      </form>
   </main>
 
@@ -198,6 +199,7 @@
             } else {
                 alert('Producto no encontrado');
                 limpiarCampos();
+                cancelarButton();
             }
         })
         .catch(error => {
@@ -253,7 +255,7 @@
         desbloquearCampos();// Vuelve a deshabilitar los botones necesarios
         deshabilitarBotones();
         limpiarCampos(); // Función que puedes crear para restablecer los campos a su estado inicial o vacío
-        document.getElementById('buscarbutton').disabled = false; // Habilita el botón buscar
+        document.getElementById('buscarbutton').disabled = true; // Habilita el botón buscar
         document.getElementById('searchIdOrName').disabled = false; // Habilita el campo de búsqueda
         cambiarACrear(); // Cambia el botón a modo "Crear"
     }
@@ -314,6 +316,7 @@
 
     function habilitarCrearButton() {
         crearButton.disabled = false;
+        document.getElementById('cancelarbutton').disabled = false;
     }
 
     searchInput.addEventListener('input', () => {
@@ -428,22 +431,51 @@
     });
 
     function crearProducto() {
+
+        
         const nombre = document.getElementById('nombre').value;
         const descripcion = document.getElementById('descripcion').value;
         const precio = document.getElementById('precio').value;
         const img = document.getElementById('img').value;
         const categoriaNombre = document.getElementById('categoria').value.toLowerCase();
+        
+        const mensajeError = document.getElementById('mensaje');
+
+        // Verificar que todos los campos estén completos
+        if (!nombre || !descripcion || !precio || !img || !categoriaNombre) {
+            mensajeError.style.display = 'block';
+            mensajeError.textContent = !nombre ? 'El nombre es obligatorio' :
+                !descripcion ? 'La descripción es obligatoria' :
+                !precio ? 'El precio es obligatorio' :
+                !img ? 'La URL de la imagen es obligatoria' :
+                !categoriaNombre ? 'La categoría es obligatoria' : '';
+            return;
+        }
 
         
-        // Realizar la solicitud POST al servidor para agregar el producto
+        // Datos a enviar al servidor
+        const datos = {
+            nombre,
+            descripcion,
+            precio,
+            img,
+            categoriaNombre
+        };
+        console.log(datos);
+        // Configuración de la solicitud fetch con método POST
         fetch('/api/productos/agregar', {
             method: 'POST',
             headers: {
-            'Content-Type': 'application/json'
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ nombre, descripcion, precio, img, categoriaNombre })
+            body: JSON.stringify(datos)
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al agregar el producto');
+            }
+            return response.json();
+        })
         .then(data => {
             // Manejar la respuesta del servidor
             console.log(data);
@@ -453,6 +485,7 @@
             console.error('Error al agregar el producto', error);
             // Manejar errores si es necesario
         });
+        mensajeError.style.display = 'none';
     }
 
 

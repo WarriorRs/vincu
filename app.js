@@ -9,6 +9,10 @@ const app = express();
 const port = 3000;
 
 app.use(cors());
+app.use(express.json());
+app.use(cookieParser()); // Configura el middleware cookieParser
+app.use(bodyParser.urlencoded({ extended: true }));
+
 // Configura la conexión a la base de datos
 const pool = new Pool({
   user: 'postgres',
@@ -18,9 +22,9 @@ const pool = new Pool({
   port: 5432,
 });
 
-app.use(cookieParser()); // Configura el middleware cookieParser
 
-app.use(bodyParser.urlencoded({ extended: true }));
+
+
 
 // Configurar Express para servir archivos estáticos desde un directorio llamado "public"
 app.use(express.static(__dirname + '/public'));
@@ -139,29 +143,40 @@ app.get('/api/productos/autocompletar', (req, res) => {
 
 app.post('/api/productos/agregar', (req, res) => {
   const { nombre, descripcion, precio, img, categoriaNombre } = req.body;
+  console.log(req.body);
 
-  const categoriaNombreMinuscula = categoriaNombre// Convertir a minúscula
+  // Verificar si el nombre del producto ya existe en la tabla de productos
+  pool.query('SELECT id FROM productos WHERE LOWER(nombre) = $1', [nombre.toLowerCase()], (err, dbRes) => {
+      if (err) {
+          console.error('Error al verificar el nombre del producto', err);
+          res.status(500).json({ error: 'Error al verificar el nombre del producto', detail: err });
+      } else if (dbRes.rows.length > 0) {
+          // Si el nombre ya existe, enviar un mensaje de error
+          res.status(400).json({ error: 'El nombre del producto ya existe' });
+      } else {
+          // Si el nombre no existe, continuar con la inserción
+          // Buscar el ID de la categoría basado en el nombre recibido en minúscula
+          pool.query('SELECT id FROM categorias WHERE LOWER(nombre) = $1', [categoriaNombre.toLowerCase()], (err, catRes) => {
+              if (err) {
+                  console.error('Error al obtener ID de categoría', err);
+                  res.status(500).json({ error: 'Error al obtener ID de categoría', detail: err });
+              } else {
+                  const categoriaId = catRes.rows[0]?.id; // El ID de la categoría encontrada
 
-  // Buscar el ID de la categoría basado en el nombre recibido en minúscula
-  pool.query('SELECT id FROM categorias WHERE LOWER(nombre) = $1', [categoriaNombreMinuscula], (err, dbRes) => {
-    if (err) {
-      console.error('Error al obtener ID de categoría', err);
-      res.status(500).json({ error: 'Error al obtener ID de categoría', detail: err }); // Agrega más detalles sobre el error
-    } else {
-      const categoriaId = dbRes.rows[0]?.id; // El ID de la categoría encontrada
-
-      // Insertar el producto con el ID de la categoría obtenido
-      pool.query('INSERT INTO productos (nombre, descripcion, precio, img, categoria_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-        [nombre, descripcion, precio, img, categoriaId],
-        (insertErr, insertRes) => {
-          if (insertErr) {
-            console.error('Error al agregar el producto', insertErr);
-            res.status(500).json({ error: 'Error al agregar el producto' });
-          } else {
-            res.status(200).json({ message: 'Producto agregado correctamente', producto: insertRes.rows[0] });
-          }
-      });
-    }
+                  // Insertar el producto con el ID de la categoría obtenido
+                  pool.query('INSERT INTO productos (nombre, descripcion, precio, img, categoria_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+                      [nombre, descripcion, precio, img, categoriaId],
+                      (insertErr, insertRes) => {
+                          if (insertErr) {
+                              console.error('Error al agregar el producto', insertErr);
+                              res.status(500).json({ error: 'Error al agregar el producto', detail: insertErr });
+                          } else {
+                              res.status(200).json({ message: 'Producto agregado correctamente', producto: insertRes.rows[0] });
+                          }
+                  });
+              }
+          });
+      }
   });
 });
 
