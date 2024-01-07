@@ -182,55 +182,101 @@ function createProductHTML(producto, elemento) {
     <html lang="en">
     <head>
       <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>${producto.nombre}</title>
       <link rel="stylesheet" href="/styles.css">
-      <link rel="icon" type="img/png" href="./logo.png">
+      <link rel="icon" type="img/png" href="/logo.png">
       <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     </head>
     <body>
-    <header>
-      <nav>
-          <a href="/"><img src="/logo.png" class="logo" alt=""></a>
-          
-          <ul>
-              <a href="/"><h1>Deposito La 103</h1></a>
-          </ul>
-          <div class="imgusermenu">
-              <img src="../log/user-photo.png" class="user_pic" id="user_pic" alt="" onclick="toggleMenu()">
-                  <span onclick="toggleMenu()">usernameDisplay</span>
-              </img>
-          </div>
-          
-          
-          <a href="/login" class="login-button" id="loginButton" style="display: none;"><img src="../log/user-photo.png" class="login-button" alt=""><span>Iniciar Sesion</span></a>
-          <div class="sub-menu-wrap" id="subMenu" style="display: none;">
-              <div class="sub-menu">
-                  <div class="user-info">
-                      <img src="../log/user-photo.png" alt="">
-                      <h2>usernameDisplay</h2>
-                  </div>
-                  <hr>
-                  <a href="/perfil" class="sub-menu-link">
-                      <img src="../log/perfilwhite.png" alt=""> <p>Perfil</p>
-                      <span></span>
-                  </a>
-                  <a href="/config" class="sub-menu-link">
-                      <img src="../log/configuracionwhite.png" alt=""> <p>Configuración</p>
-                      <span></span>
-                  </a>
-                  <a href="/logout" class="sub-menu-link">
-                      <img src="../log/salidawhite.png" alt=""> <p>Cerrar Sesión</p>
-                      <span></span>
-                  </a>
-              </div>
-          </div>
-      </nav>
-    </header>
-      <h1>${producto.nombre}</h1>
-      <img src="${producto.img}" alt="${producto.nombre}">
-      <p>Descripción: ${producto.descripcion}</p>
-      <p>Precio: $${producto.precio}</p>
+      <header>
+        <nav>
+            <a href="/"><img src="/logo.png" class="logo" alt=""></a>
+            
+            <ul>
+                <a href="/"><h1>Deposito La 103</h1></a>
+            </ul>
+            <div class="imgusermenu">
+                <img src="/log/user-photo.png" class="user_pic" id="user_pic" alt="" onclick="toggleMenu()">
+                    <span onclick="toggleMenu()">usernameDisplay</span>
+                </img>
+            </div>
+            
+            
+            <a href="/login" class="login-button" id="loginButton" style="display: none;"><img src="/log/user-photo.png" class="login-button" alt=""><span>Iniciar Sesion</span></a>
+            <div class="sub-menu-wrap" id="subMenu" style="display: none;">
+                <div class="sub-menu">
+                    <div class="user-info">
+                        <img src="/log/user-photo.png" alt="">
+                        <h2>usernameDisplay</h2>
+                    </div>
+                    <hr>
+                    <a href="/perfil" class="sub-menu-link">
+                        <img src="/log/perfilwhite.png" alt=""> <p>Perfil</p>
+                        <span></span>
+                    </a>
+                    <a href="/config" class="sub-menu-link">
+                        <img src="/log/configuracionwhite.png" alt=""> <p>Configuración</p>
+                        <span></span>
+                    </a>
+                    <a href="/logout" class="sub-menu-link">
+                        <img src="/log/salidawhite.png" alt=""> <p>Cerrar Sesión</p>
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+      </header>
+      
+      <div class="product-object">
+        <section>
+          <h1>${producto.nombre}</h1>
+          <img src="${producto.img}" alt="${producto.nombre}">
+          <p>Descripción: ${producto.descripcion}</p>
+          <p>Precio: $${producto.precio}</p>
+        </section>
+      </div>
+    
+      <footer>
+        <fieldset id="footer-fieldset">
+            <p>&copy; 2023 Deposito La 103</p>
+        </fieldset>
+      </footer>
+      <script>
+        function closeChatbot() {
+            document.querySelector('.chatbot-container').style.display = 'none';
+        }
+
+        if (document.cookie.includes('logged_in=true')) {
+        // Si está logeado, muestra el menú desplegable y el nombre de usuario
+        document.getElementById('loginButton').style.display = 'none'; // Oculta el botón de inicio de sesión
+        document.getElementById('subMenu').style.display = 'block'; // Muestra el menú desplegable
+
+        // Configura el nombre de usuario
+        const username = document.cookie.replace(/(?:(?:^|.*;\s*)username\s*=\s*([^;]*).*$)|^.*$/, '$1');
+        document.querySelector('.user-info h2').textContent = username;
+        document.querySelector('.imgusermenu span').textContent = username;
+
+        } else {
+            // Si no está logeado, muestra el botón de inicio de sesión y oculta el menú desplegable
+            document.getElementById('loginButton').style.display = 'block'; // Muestra el botón de inicio de sesión
+            document.getElementById('subMenu').style.display = 'none'; // Oculta el menú desplegable
+            document.querySelector('.imgusermenu').style.display= 'none';
+
+        }
+
+        let subMenu = document.getElementById("subMenu");
+
+        function toggleMenu(){
+            subMenu.classList.toggle("open-menu")
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('username');
+        document.getElementById('usernameDisplay').textContent = username;
+    </script>
     </body>
+    
     </html>
   `;
 
@@ -267,6 +313,7 @@ elementos.forEach(elemento => {
   app.get(`/pages/${elemento}/:productName`, (req, res) => {
     const productName = req.params.productName;
     res.sendFile(`${__dirname}/pages/${elemento}/${productName}.html`);
+    const username = req.body.username;
   });
 });
 

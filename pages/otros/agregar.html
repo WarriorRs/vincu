@@ -206,34 +206,7 @@
         });
     }
 
-    function crearProducto() {
-        const nombre = document.getElementById('nombre').value;
-        const descripcion = document.getElementById('descripcion').value;
-        const precio = document.getElementById('precio').value;
-        const img = document.getElementById('img').value;
-        const categoriaNombre = document.getElementById('categoria').value.toLowerCase();
-
-        console.log(categoriaNombre);
-        // Realizar la solicitud POST al servidor para agregar el producto
-        fetch('/api/productos/agregar.json', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ nombre, descripcion, precio, img, categoriaNombre })
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Manejar la respuesta del servidor
-            console.log(data);
-            // Realizar acciones adicionales si es necesario
-        })
-        .catch(error => {
-            console.error('Error al agregar el producto', error);
-            // Manejar errores si es necesario
-        });
-    }
-
+   
     function limpiarCampos() {
         document.getElementById('searchIdOrName').value = ''; // Limpia el campo de buscar
         document.getElementById('nombre').value = ''; // Limpia el campo de nombre
@@ -453,6 +426,35 @@
             precioPreview.textContent = `Precio: $${formattedPrice}`;
         }
     });
+
+    function crearProducto() {
+        const nombre = document.getElementById('nombre').value;
+        const descripcion = document.getElementById('descripcion').value;
+        const precio = document.getElementById('precio').value;
+        const img = document.getElementById('img').value;
+        const categoriaNombre = document.getElementById('categoria').value.toLowerCase();
+
+        
+        // Realizar la solicitud POST al servidor para agregar el producto
+        fetch('/api/productos/agregar', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ nombre, descripcion, precio, img, categoriaNombre })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Manejar la respuesta del servidor
+            console.log(data);
+            // Realizar acciones adicionales si es necesario
+        })
+        .catch(error => {
+            console.error('Error al agregar el producto', error);
+            // Manejar errores si es necesario
+        });
+    }
+
 
     const urlParams = new URLSearchParams(window.location.search);
     const username = urlParams.get('username');
