@@ -94,14 +94,17 @@
           var productListSection = $('#product-list');
 
           // Recorrer los productos y agregarlos a la lista
-          data.productos.forEach(function(producto) {
+           data.productos.forEach(function(producto) {
+            var productLink = $('<a></a>').attr('href', `/pages/cerveza/${producto.nombre.toLowerCase().replace(/\s+/g, '_')}`).appendTo(productListSection);
             var productItem = $('<div class="product-item"></div>');
             var productName = $('<h3></h3>').text(producto.nombre);
             var productImage = $('<img>').attr('src', producto.img).attr('alt', producto.nombre);
             var productPrice = $('<span></span>').text('Precio: $' + producto.precio);
+            var space = $('<br>');
+            var productDescription = $('<span></span>').text(producto.descripcion)
 
-            productItem.append(productName, productImage, productPrice);
-            productListSection.append(productItem);
+            productItem.append(productName, productImage, productPrice, space, productDescription);
+            productLink.append(productItem);
           });
         },
         error: function(err) {

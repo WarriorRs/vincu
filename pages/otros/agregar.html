@@ -13,7 +13,7 @@
   <header>
     <nav>
         <a href="/"><img src="/logo.png" class="logo" alt=""></a>
-        
+
         <ul>
             <a href="/"><h1>Deposito La 103</h1></a>
         </ul>
@@ -22,8 +22,8 @@
                 <span onclick="toggleMenu()">usernameDisplay</span>
             </img>
         </div>
-        
-        
+
+
         <a href="/login" class="login-button" id="loginButton" style="display: none;"><img src="../log/user-photo.png" class="login-button" alt=""><span>Iniciar Sesion</span></a>
         <div class="sub-menu-wrap" id="subMenu" style="display: none;">
             <div class="sub-menu">
@@ -62,7 +62,7 @@
                     <input type="text" id="searchIdOrName" name="searchIdOrName" placeholder="Busca un producto">
                     <div id="sugerencias" class="sugerencias"></div>
                     <button type="button" id="buscarbutton" onclick="buscarProducto()">Buscar</button><br><br>
-            
+
                     <label for="categoria">Categoría:</label>
                     <select id="categoria" name="categoria">
                         <option value="" disabled selected>Selecciona una categoría</option>
@@ -71,17 +71,17 @@
 
                     <label for="nombre">Nombre:</label>
                     <input type="text" id="nombre" name="nombre" placeholder="Nombre del producto">
-                  
+
                     <label for="descripcion">Descripción:</label>
                     <input type="text" id="descripcion" name="descripcion" placeholder="Descripción del producto">
-                  
+
                     <label for="precio">Precio (USD):</label>
                     <input type="number" id="precio" name="precio" min="0.00" inputmode="numeric" pattern="^\d+(\.\d{1,2})?$" placeholder="Formato: $0.00">
-                  
+
                     <!-- Input para subir imagen con URL -->
                     <label for="img">Enlace de la Imagen:</label>
                     <input type="text" id="img" name="img" placeholder="URL de la imagen">
-                  
+
                     <!-- Campo oculto para almacenar el ID del producto encontrado -->
                     <input type="hidden" id="productID" name="productID">
                 </div>
@@ -101,9 +101,10 @@
             <button type="button" id="eliminarbutton" onclick="eliminarProducto()">Eliminar</button>
             <button type="button" id="cancelarbutton" onclick="cancelarButton()">Cancelar</button>
         </div>
+        <div id="mensaje" style="display: none;"></div>
      </form>
   </main>
-  
+
   <script>
     function closeChatbot() {
         document.querySelector('.chatbot-container').style.display = 'none';
@@ -154,7 +155,7 @@
     function buscarProducto() {
         bloquearCampos();
         const searchQuery = document.getElementById('searchIdOrName').value.toLowerCase();
-            
+
         fetch(`/api/productos/buscar?q=${searchQuery}`)
             .then(response => response.json())
             .then(data => {
@@ -168,7 +169,7 @@
                 document.getElementById('descripcion').value = productoEncontrado.descripcion;
                 document.getElementById('precio').value = productoEncontrado.precio;
                 document.getElementById('productID').value = productoEncontrado.id;
-                document.getElementById('img    ').value = productoEncontrado.img;
+                document.getElementById('img').value = productoEncontrado.img;
 
                 // Seleccionar la categoría del producto en el select
                 const categoriaSelect = document.getElementById('categoria');
@@ -181,7 +182,6 @@
                         break;
                     }
                 }
-
                 // Actualizar la previsualización del nombre, precio e imagen si están disponibles
                 const nombrePreviewLabel = document.querySelector('.prev-img-product label');
                 const precioPreview = document.querySelector('.prev-img-product p');
@@ -199,51 +199,40 @@
                 alert('Producto no encontrado');
                 limpiarCampos();
             }
-                })
-                .catch(error => {
-                    console.error('Error al buscar producto:', error);
-                    alert('Error al buscar producto');
-                });
-        }
+        })
+        .catch(error => {
+            console.error('Error al buscar producto:', error);
+            alert('Error al buscar producto');
+        });
+    }
 
     function crearProducto() {
         const nombre = document.getElementById('nombre').value;
         const descripcion = document.getElementById('descripcion').value;
-        const categoriaNombre = document.getElementById('categoria').value.toLowerCase(); // Obtener el nombre de la categoría seleccionada
         const precio = document.getElementById('precio').value;
         const img = document.getElementById('img').value;
+        const categoriaNombre = document.getElementById('categoria').value.toLowerCase();
 
-        // Realizar una solicitud POST a tu backend
-        fetch('/api/productos/crear', {
+        console.log(categoriaNombre);
+        // Realizar la solicitud POST al servidor para agregar el producto
+        fetch('/api/productos/agregar.json', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                nombre,
-                descripcion,
-                categoriaNombre,
-                precio,
-                img,
-            }),
+            body: JSON.stringify({ nombre, descripcion, precio, img, categoriaNombre })
         })
         .then(response => response.json())
         .then(data => {
-        // Manejar la respuesta del servidor
-            const mensajeElement = document.getElementById('mensaje');
-            mensajeElement.textContent = 'Producto creado exitosamente';
-            mensajeElement.style.display = 'block'; // Mostrar el mensaje
-            document.getElementById('productForm').reset(); // Restablecer el formulario después de la creación exitosa
+            // Manejar la respuesta del servidor
+            console.log(data);
+            // Realizar acciones adicionales si es necesario
         })
         .catch(error => {
-            // Manejar cualquier error que pueda ocurrir durante la solicitud
-            console.error('Error al crear producto:', error);
-            const mensajeElement = document.getElementById('mensaje');
-            mensajeElement.textContent = 'Error al crear el producto';
-            mensajeElement.style.display = 'block'; // Mostrar el mensaje de error
+            console.error('Error al agregar el producto', error);
+            // Manejar errores si es necesario
         });
     }
-
 
     function limpiarCampos() {
         document.getElementById('searchIdOrName').value = ''; // Limpia el campo de buscar
@@ -252,7 +241,7 @@
         document.getElementById('descripcion').value = ''; // Limpia el campo de descripción
         document.getElementById('precio').value = ''; // Limpia el campo de precio
         document.getElementById('img').value = null; // Limpia el campo de imagen (input type="file" no se puede limpiar como los campos de texto)
-        
+
         // Restablecer la previsualización de la imagen
         const nombrePreviewLabel = document.querySelector('.prev-img-product label');
         const precioPreview = document.querySelector('.prev-img-product p');
@@ -293,7 +282,7 @@
         limpiarCampos(); // Función que puedes crear para restablecer los campos a su estado inicial o vacío
         document.getElementById('buscarbutton').disabled = false; // Habilita el botón buscar
         document.getElementById('searchIdOrName').disabled = false; // Habilita el campo de búsqueda
-        cambiarACrear(); // Cambia el botón a modo "Crear"        
+        cambiarACrear(); // Cambia el botón a modo "Crear"
     }
 
     // Llamada a la función para deshabilitar los botones al cargar la página
@@ -423,8 +412,6 @@
       .catch(error => console.error('Error al cargar categorías:', error));
   });
 
-    
-
     let subMenu = document.getElementById("subMenu");
 
     function toggleMenu(){
@@ -467,7 +454,6 @@
         }
     });
 
-    
     const urlParams = new URLSearchParams(window.location.search);
     const username = urlParams.get('username');
     document.getElementById('usernameDisplay').textContent = username;

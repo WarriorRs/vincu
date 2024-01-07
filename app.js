@@ -137,39 +137,33 @@ app.get('/api/productos/autocompletar', (req, res) => {
   );
 });
 
-// Agrega una ruta para crear un nuevo producto
-app.post('/api/productos/crear', (req, res) => {
-  const { nombre, descripcion, categoriaNombre, precio, img } = req.body;
+app.post('/api/productos/agregar', (req, res) => {
+  const { nombre, descripcion, precio, img, categoriaNombre } = req.body;
 
-  // Primero, obtén el ID de la categoría basado en su nombre
-  pool.query('SELECT id FROM categorias WHERE LOWER(nombre) = $1', [categoriaNombre], (err, dbRes) => {
-      if (err) {
-          console.error('Error al buscar la categoría:', err);
-          res.status(500).json({ error: 'Error al buscar la categoría' });
-      } else {
-          if (dbRes.rows.length > 0) {
-              const categoriaId = dbRes.rows[0].id;
+  const categoriaNombreMinuscula = categoriaNombre// Convertir a minúscula
 
-              // Insertar el nuevo producto en la base de datos
-              pool.query(
-                  'INSERT INTO productos (nombre, descripcion, categoria_id, precio, img) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-                  [nombre, descripcion, categoriaId, precio, img],
-                  (insertErr, insertRes) => {
-                      if (insertErr) {
-                          console.error('Error al crear el producto:', insertErr);
-                          res.status(500).json({ error: 'Error al crear el producto' });
-                      } else {
-                          res.status(200).json({ message: 'Producto creado exitosamente', producto: insertRes.rows[0] });
-                      }
-                  }
-              );
+  // Buscar el ID de la categoría basado en el nombre recibido en minúscula
+  pool.query('SELECT id FROM categorias WHERE LOWER(nombre) = $1', [categoriaNombreMinuscula], (err, dbRes) => {
+    if (err) {
+      console.error('Error al obtener ID de categoría', err);
+      res.status(500).json({ error: 'Error al obtener ID de categoría', detail: err }); // Agrega más detalles sobre el error
+    } else {
+      const categoriaId = dbRes.rows[0]?.id; // El ID de la categoría encontrada
+
+      // Insertar el producto con el ID de la categoría obtenido
+      pool.query('INSERT INTO productos (nombre, descripcion, precio, img, categoria_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+        [nombre, descripcion, precio, img, categoriaId],
+        (insertErr, insertRes) => {
+          if (insertErr) {
+            console.error('Error al agregar el producto', insertErr);
+            res.status(500).json({ error: 'Error al agregar el producto' });
           } else {
-              res.status(404).json({ error: 'Categoría no encontrada' });
+            res.status(200).json({ message: 'Producto agregado correctamente', producto: insertRes.rows[0] });
           }
-      }
+      });
+    }
   });
 });
-
 
 // Iterar a través de los elementos y crear rutas
 otros.forEach(otros => {
@@ -179,7 +173,78 @@ otros.forEach(otros => {
   });
 });
 
-// Ruta para obtener los datos de los productos en formato JSON
+// Crear archivos HTML para cada producto
+function createProductHTML(producto, elemento) {
+  const nombreProducto = producto.nombre.toLowerCase().replace(/\s+/g, '_');
+
+  const contenidoHTML = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>${producto.nombre}</title>
+      <link rel="stylesheet" href="/styles.css">
+      <link rel="icon" type="img/png" href="./logo.png">
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+    <body>
+    <header>
+      <nav>
+          <a href="/"><img src="/logo.png" class="logo" alt=""></a>
+          
+          <ul>
+              <a href="/"><h1>Deposito La 103</h1></a>
+          </ul>
+          <div class="imgusermenu">
+              <img src="../log/user-photo.png" class="user_pic" id="user_pic" alt="" onclick="toggleMenu()">
+                  <span onclick="toggleMenu()">usernameDisplay</span>
+              </img>
+          </div>
+          
+          
+          <a href="/login" class="login-button" id="loginButton" style="display: none;"><img src="../log/user-photo.png" class="login-button" alt=""><span>Iniciar Sesion</span></a>
+          <div class="sub-menu-wrap" id="subMenu" style="display: none;">
+              <div class="sub-menu">
+                  <div class="user-info">
+                      <img src="../log/user-photo.png" alt="">
+                      <h2>usernameDisplay</h2>
+                  </div>
+                  <hr>
+                  <a href="/perfil" class="sub-menu-link">
+                      <img src="../log/perfilwhite.png" alt=""> <p>Perfil</p>
+                      <span></span>
+                  </a>
+                  <a href="/config" class="sub-menu-link">
+                      <img src="../log/configuracionwhite.png" alt=""> <p>Configuración</p>
+                      <span></span>
+                  </a>
+                  <a href="/logout" class="sub-menu-link">
+                      <img src="../log/salidawhite.png" alt=""> <p>Cerrar Sesión</p>
+                      <span></span>
+                  </a>
+              </div>
+          </div>
+      </nav>
+    </header>
+      <h1>${producto.nombre}</h1>
+      <img src="${producto.img}" alt="${producto.nombre}">
+      <p>Descripción: ${producto.descripcion}</p>
+      <p>Precio: $${producto.precio}</p>
+    </body>
+    </html>
+  `;
+
+  const fs = require('fs');
+  fs.writeFile(`./pages/${elemento}/${nombreProducto}.html`, contenidoHTML, err => {
+    if (err) {
+      console.error('Error al escribir archivo HTML', err);
+    } else {
+      console.log(`Archivo ${nombreProducto}.html creado para el producto ${producto.nombre}`);
+    }
+  });
+}
+
+// Obtener archivos HTML para cada producto al iniciar la aplicación
 elementos.forEach(elemento => {
   app.get(`/api/${elemento}`, (req, res) => {
     pool.query('SELECT p.nombre, p.descripcion, p.precio, p.img, c.nombre AS categoria_nombre FROM productos p INNER JOIN categorias c ON p.categoria_id = c.id WHERE c.nombre = $1', [elemento], (err, dbRes) => {
@@ -187,12 +252,24 @@ elementos.forEach(elemento => {
         console.error('Error al obtener productos', err);
         res.status(500).json({ error: 'Error al obtener productos' });
       } else {
-        res.status(200).json({ productos: dbRes.rows });
+        const productos = dbRes.rows;
+
+        productos.forEach(producto => {
+          createProductHTML(producto, elemento);
+        });
+
+        res.status(200).json({ productos });
       }
     });
   });
+
+  // Definir la ruta para cada producto
+  app.get(`/pages/${elemento}/:productName`, (req, res) => {
+    const productName = req.params.productName;
+    res.sendFile(`${__dirname}/pages/${elemento}/${productName}.html`);
+  });
 });
-  
+
 app.post('/login', (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
@@ -214,7 +291,6 @@ app.post('/login', (req, res) => {
     }
   });
 });
-
 
 
 
