@@ -107,6 +107,11 @@
     transition: background-color 0.3s;
 }
 
+.botones-api #actualizarbutton{
+    background-color: rgb(112, 186, 0);
+    transition: background-color 0.3s;
+}
+
 .botones-api #modificarbutton{
     background-color: orange;
     transition: background-color 0.3s;
@@ -125,6 +130,9 @@
 }
 
 .botones-api #crearbutton:hover{
+    background-color: rgb(70, 117, 0);
+}
+.botones-api #actualizarbutton:hover{
     background-color: rgb(70, 117, 0);
 }
 

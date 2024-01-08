@@ -332,6 +332,43 @@ elementos.forEach(elemento => {
   });
 });
 
+
+app.put('/api/productos/actualizar', (req, res) => {
+  const { id, nombre, descripcion, precio, img, categoriaNombre } = req.body;
+
+  // Buscar el ID de la categoría basado en el nombre recibido
+  pool.query('SELECT id FROM categorias WHERE LOWER(nombre) = $1', [categoriaNombre.toLowerCase()], (catErr, catRes) => {
+    if (catErr) {
+      console.error('Error al buscar ID de la categoría', catErr);
+      res.status(500).json({ error: 'Error al buscar ID de la categoría' });
+    } else {
+      if (catRes.rows.length === 1) {
+        const categoriaId = catRes.rows[0].id;
+
+        // Actualizar el producto utilizando el ID proporcionado
+        pool.query(
+          'UPDATE productos SET nombre = $1, descripcion = $2, precio = $3, img = $4, categoria_id = $5 WHERE id = $6',
+          [nombre, descripcion, precio, img, categoriaId, id],
+          (updateErr, updateRes) => {
+            if (updateErr) {
+              console.error('Error al actualizar el producto', updateErr);
+              res.status(500).json({ error: 'Error al actualizar el producto' });
+            } else {
+              res.status(200).json({ message: 'Producto actualizado correctamente' });
+            }
+          }
+        );
+      } else {
+        res.status(404).json({ error: 'Categoría no encontrada' });
+      }
+    }
+  });
+});
+
+
+
+
+
 app.post('/login', (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
@@ -349,6 +386,23 @@ app.post('/login', (req, res) => {
         res.redirect('/');
       } else {
         res.redirect('/login?error=Credenciales%20incorrectas');
+      }
+    }
+  });
+});
+
+app.delete('/api/productos/delete', (req, res) => {
+  const productId = req.query.q;
+
+  pool.query('DELETE FROM productos WHERE id = $1', [productId], (err, dbRes) => {
+    if (err) {
+      console.error('Error al eliminar el producto', err);
+      res.status(500).json({ error: 'Error al eliminar el producto' });
+    } else {
+      if (dbRes.rowCount === 1) {
+        res.status(200).json({ message: 'Producto eliminado correctamente' });
+      } else {
+        res.status(404).json({ error: 'Producto no encontrado' });
       }
     }
   });

@@ -104,6 +104,16 @@
         </div>
         <div id="mensaje" class="error-message" style="display: none;"></div>
      </form>
+     <div id="modal" class="modal-container" style="display: none;">
+        <div class="modal">
+            <h2>Confirmar acción</h2>
+            <p>¿Estás seguro de que quieres realizar esta acción?</p>
+            <div class="modal-buttons">
+                <button type="button" onclick="performAction()">Confirmar</button>
+                <button type="button" onclick="closeModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
   </main>
 
   <script>
@@ -139,18 +149,19 @@
     }
 
     function cambiarAActualizar() {
-        const crearButton = document.getElementById('crearbutton');
-        crearButton.textContent = 'Actualizar';
-        crearButton.removeEventListener('click', crearProducto);
-        crearButton.addEventListener('click', actualizarProducto);
+        const crearbutton = document.getElementById('crearbutton');
+        crearbutton.textContent = 'Actualizar';
+        crearbutton.setAttribute('onclick', 'actualizarProducto()');
+        crearbutton.id = 'actualizarbutton'; // Cambiar la ID del botón
     }
 
     function cambiarACrear() {
-        const crearButton = document.getElementById('crearbutton');
-        crearButton.textContent = 'Crear';
-        crearButton.removeEventListener('click', actualizarProducto);
-        crearButton.addEventListener('click', crearProducto);
+        const actualizarbutton = document.getElementById('actualizarbutton');
+        actualizarbutton.textContent = 'Crear';
+        actualizarbutton.setAttribute('onclick', 'crearProducto()');
+        actualizarbutton.id = 'crearbutton'; // Cambiar la ID del botón
     }
+
 
 
     function buscarProducto() {
@@ -233,14 +244,15 @@
         document.getElementById('descripcion').disabled = false;
         document.getElementById('precio').disabled = false;
         document.getElementById('img').disabled = false;
-        document.getElementById('crearbutton').disabled = false;
     }
+
 
     function modificarProducto() {
         document.getElementById('buscarbutton').disabled = true; // Deshabilita el botón buscarProducto
         document.getElementById('searchIdOrName').disabled = true;
         desbloquearCampos(); // Habilita los campos y el botón de crear
         cambiarAActualizar();
+        document.getElementById('actualizarbutton').disabled = false;
     }
 
     // Función para deshabilitar todos los botones excepto el de la imagen al cargar la página
@@ -252,12 +264,15 @@
     }
 
     function cancelarButton() {
+        limpiarCampos(); // Función que puedes crear para restablecer los campos a su estado inicial o vacío
         desbloquearCampos();// Vuelve a deshabilitar los botones necesarios
         deshabilitarBotones();
-        limpiarCampos(); // Función que puedes crear para restablecer los campos a su estado inicial o vacío
         document.getElementById('buscarbutton').disabled = true; // Habilita el botón buscar
         document.getElementById('searchIdOrName').disabled = false; // Habilita el campo de búsqueda
-        cambiarACrear(); // Cambia el botón a modo "Crear"
+        const actualizarButton = document.getElementById('actualizarbutton');
+        if (actualizarButton) {
+            cambiarACrear();
+        }
     }
 
     // Llamada a la función para deshabilitar los botones al cargar la página
@@ -440,18 +455,6 @@
         const categoriaNombre = document.getElementById('categoria').value.toLowerCase();
         
         const mensajeError = document.getElementById('mensaje');
-
-        // Verificar que todos los campos estén completos
-        if (!nombre || !descripcion || !precio || !img || !categoriaNombre) {
-            mensajeError.style.display = 'block';
-            mensajeError.textContent = !nombre ? 'El nombre es obligatorio' :
-                !descripcion ? 'La descripción es obligatoria' :
-                !precio ? 'El precio es obligatorio' :
-                !img ? 'La URL de la imagen es obligatoria' :
-                !categoriaNombre ? 'La categoría es obligatoria' : '';
-            return;
-        }
-
         
         // Datos a enviar al servidor
         const datos = {
@@ -487,6 +490,134 @@
         });
         mensajeError.style.display = 'none';
     }
+
+    function actualizarProducto() {
+        const nombre = document.getElementById('nombre').value;
+        const descripcion = document.getElementById('descripcion').value;
+        const precio = document.getElementById('precio').value;
+        const img = document.getElementById('img').value;
+        const categoriaNombre = document.getElementById('categoria').value.toLowerCase();
+        const productID = document.getElementById('productID').value;
+
+        const mensajeError = document.getElementById('mensaje');
+
+        // Verificar que todos los campos estén completos
+        if (!nombre || !descripcion || !precio || !img || !categoriaNombre) {
+            mensajeError.style.display = 'block';
+            mensajeError.textContent = !nombre ? 'El nombre es obligatorio' :
+                !descripcion ? 'La descripción es obligatoria' :
+                !precio ? 'El precio es obligatorio' :
+                !img ? 'La URL de la imagen es obligatoria' :
+                !categoriaNombre ? 'La categoría es obligatoria' : '' ; 
+            return;
+        }
+
+        // Datos a enviar al servidor para actualizar el producto
+        const datos = {
+            id: productID,
+            nombre,
+            descripcion,
+            precio,
+            img,
+            categoriaNombre
+        };
+
+        // Configuración de la solicitud fetch con método PUT para actualizar el producto
+        fetch('/api/productos/actualizar', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datos)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al actualizar el producto');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Manejar la respuesta del servidor
+            console.log(data);
+            // Realizar acciones adicionales si es necesario
+        })
+        .catch(error => {
+            console.error('Error al actualizar el producto', error);
+            // Manejar errores si es necesario
+        });
+
+        mensajeError.style.display = 'none';
+    }
+
+    function eliminarProducto(){
+        console.log('hola');
+    }
+
+    function mostrarModal(mensaje, accionConfirmar) {
+        const modalContainer = document.createElement('div');
+        modalContainer.className = 'modal-container';
+
+        const modalContent = `
+            <div class="modal">
+                <p>${mensaje}</p>
+                <div class="modal-buttons">
+                    <button id="confirmar">Confirmar</button>
+                    <button id="cancelar">Cancelar</button>
+                </div>
+            </div>
+        `;
+        modalContainer.innerHTML = modalContent;
+
+        // Eventos de los botones solo después de agregar al DOM
+        document.body.appendChild(modalContainer);
+
+        // Agregar evento al botón de confirmar
+        document.getElementById('confirmar').addEventListener('click', () => {
+            accionConfirmar();
+            document.body.removeChild(modalContainer); // Cerrar modal después de la acción
+        });
+
+        // Agregar evento al botón de cancelar
+        document.getElementById('cancelar').addEventListener('click', () => {
+            document.body.removeChild(modalContainer); // Cerrar modal al cancelar
+        });
+    }
+
+
+    function confirmarCrearProducto() {
+        // Verificar que todos los campos estén completos
+        if (!nombre || !descripcion || !precio || !img || !categoriaNombre) {
+            mensajeError.style.display = 'block';
+            mensajeError.textContent = !nombre ? 'El nombre es obligatorio' :
+                !descripcion ? 'La descripción es obligatoria' :
+                !precio ? 'El precio es obligatorio' :
+                !img ? 'La URL de la imagen es obligatoria' :
+                !categoriaNombre ? 'La categoría es obligatoria' : '';
+            return;
+        }
+
+        crearProducto(); // Llamada a tu función para crear un producto
+    }
+
+    function confirmarActualizarProducto() {
+        // Aquí colocas la lógica para actualizar el producto
+        actualizarProducto(); // Llamada a tu función para actualizar un producto
+    }
+
+    function confirmarEliminarProducto() {
+        mostrarModal('¿Estás seguro de que quieres eliminar este producto? \n Esta acción es irreversible', eliminarProducto);
+    }
+
+    document.getElementById('crearbutton').addEventListener('click', () => {
+    mostrarModal('¿Estás seguro de que quieres confirmar esta acción?', crearProducto);
+    });
+    
+    document.getElementById('actualizarbutton').addEventListener('click', () => {
+    mostrarModal('¿Estás seguro de que quieres actualizar este producto?', actualizarProducto);
+    });
+
+    // Modificar el evento del botón de eliminar para abrir el modal
+    document.getElementById('eliminarbutton').addEventListener('click', eliminarProducto);
 
 
     const urlParams = new URLSearchParams(window.location.search);
